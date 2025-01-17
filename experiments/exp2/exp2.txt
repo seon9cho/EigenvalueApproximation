@@ -1,0 +1,13 @@
+model = Sequential()
+height = 64
+layers = 16
+model.add(Dense(height, input_dim=33, activation='relu'))
+for i in range(layers-1):
+    model.add(Dense(height, activation='relu'))
+model.add(Dense(1, activation='relu'))
+model.compile(loss='mean_absolute_error',
+             optimizer='adam')
+
+n_epochs = 120
+h = model.fit(XL_train, YL_train, batch_size=32, epochs=n_epochs, verbose=1, validation_split=0.2)
+s = model.evaluate(XL_test, YL_test, batch_size=20)
