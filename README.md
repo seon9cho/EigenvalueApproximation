@@ -162,21 +162,18 @@ and Figure 2 shows this region in the complex plane. Observe that the area of th
 
 ## Machine Learning Approach
 
-One of the potential ways of finding a good eigenvalue estimate would be then to find the index along which the matrix would be reduced in order to minimize the resulting Gershgorin regions. This problem was approached using machine learning algorithms. The objective of the problem in high-level would then be---given a square matrix as the input, can a model produce an output that would specify the row index of which when reduced, would decrease the area of the Gershgorin region the most? 
+One of the potential ways of finding a good eigenvalue estimate would be then to find the index along which the matrix would be reduced in order to minimize the resulting Gershgorin regions. This problem was approached using machine learning algorithms. The objective of the problem in high-level would then be &mdash; given a square matrix as the input, can a model produce an output that would specify the row index of which when reduced, would decrease the area of the Gershgorin region the most? 
 
 In order to attempt this problem, a training and testing datasets were created. Each of the datapoints contained a randomly generated 8 by 8 matrix, the initial area of the Gershgorin regions, the row/column along which it would be reduced, and the area of the Gershgorin region of the reduced matrix. The matrices were generated so that the eigenvalues would be bounded within modulus of 10. 
 
-\begin{figure}
-    \centering
-    \adjustimage{max size={0.3\linewidth}{1.0\paperheight}}{2_1.png}
-    \adjustimage{max size={0.3\linewidth}{1.0\paperheight}}{2_2.png}
-    \adjustimage{max size={0.3\linewidth}{1.0\paperheight}}{2_3.png}
-    \adjustimage{max size={0.3\linewidth}{1.0\paperheight}}{2_4.png}
-    \adjustimage{max size={0.3\linewidth}{1.0\paperheight}}{2_5.png}
-    \adjustimage{max size={0.3\linewidth}{1.0\paperheight}}{2_6.png}
-    \caption{Figure 3. The 6 different ways $M$ can be reduced to a 2 by 2 matrix and their resulting Gershgorin regions.}
-    \label{fig:gersh3}
-\end{figure}
+<br>
+<div align="center">
+
+  <img src="graphics/2_1.png" width=250> <img src="graphics/2_2.png" width=250> <img src="graphics/2_3.png" width=250>
+  <img src="graphics/2_4.png" width=250> <img src="graphics/2_5.png" width=250> <img src="graphics/2_6.png" width=250>
+  
+  Figure 3. The 6 different ways $M$ can be reduced to a 2 by 2 matrix and their resulting Gershgorin regions.
+</div>
 
 I believed that a deep neural network model would be most suitable for such problem. Many different architectures of the model was tested, including linear layers, bilinear layers, and higher dimensional tensor layers. Different approaches of the criterion was also tested. One of the tested method was to let the model output 8-dimensional vector which would sum to one after passing through a soft-max activation function. The label this output was compared against was produced by finding the percentage of area decreased when the matrix was reduced along each row, then normalizing it to sum to 1. The labels would then represent a distribution of how the area would be reduced, and so Kullback-Leibler divergence was used as the cost function to minimize the difference of the output distribution and the label. 
 
@@ -184,28 +181,34 @@ Another approach was to simply let the model output an n-dimensional vector, whe
 
 I suspect that this is because the Gershgorin regions of the resulting matrix after it has been reduced along a specific row is a highly abstract information that cannot be easily obtained as a function. Machine learning was not a suitable approach in order to solve this problem after all.
 
+<br>
+<div align="center">
+
+  <img src="graphics/intersection.png" width=500>
+  
+  Figure 4. The region obtained by taking the intersection of all of the 2 by 2 reduction regions.
+</div>
+
+
 ## Intersection of the Regions
 
-To reduce the Gershgorin region the most, we would want to reduce the matrix to be 2 by 2, so we would want the cardinality of our index set $S$ to be $|S| = 2$. However, there are multiple sets of $S$ we can reduce it along, and for each of the reduction, the eigenvalues of $M$ must lie in each one of the resulting Gershgorin regions. The 6 different ways our example matrix $M$ can be reduced is shown in Figure \ref{fig:gersh3}. Then, this would mean that the eigenvalues must lie in the intersection of all of these regions. This can be summarized as:
-$$
-\sigma(M) \subset \bigcap_{S'} \Gamma(\mathcal{R}_{S'}(M)
-$$
+To reduce the Gershgorin region the most, we would want to reduce the matrix to be 2 by 2, so we would want the cardinality of our index set $S$ to be $|S| = 2$. However, there are multiple sets of $S$ we can reduce it along, and for each of the reduction, the eigenvalues of $M$ must lie in each one of the resulting Gershgorin regions. The 6 different ways our example matrix $M$ can be reduced is shown in Figure 3. Then, this would mean that the eigenvalues must lie in the intersection of all of these regions. This can be summarized as:
+
+```math
+\sigma(M) \subset {\Large\bigcap}_{S'} \Gamma(\mathcal{R}_{S'}(M)
+```
 
 After finding the intersection of the regions, I have found that the area of the resulting regions are significantly smaller than the area of the smallest 2 by 2 region at 1.93. This intersected region is shown in Figure \ref{fig:gersh4}. Using this region, we can then approximate the eigenvalues of the matrix.
 
-\begin{figure}
-    \centering
-    \adjustimage{max size={0.6\linewidth}{1.0\paperheight}}{intersection.png}
-    \caption{Figure 4. The region obtained by taking the tersection of all of the 2 by 2 reduction regions.}
-    \label{fig:gersh4}
-\end{figure}
 
 ### Cost Analysis
 
 The most costly part about this comes from having to calculate the inverse of $M_{\overline{S}\overline{S}} - \lambda I$. However, since this is an update of the matrix $M_{\overline{S}\overline{S}}$, there might be a formula similar to Sherman-Woodbury-Morrison that might be able to solve this inverse quickly given the inverse of $M_{\overline{S}\overline{S}}$. Also, there are a total of $\binom{n}{2}$ possible 2 by 2 reduction of a $n$ by $n$ matrix. Then, letting the cost of the inver be $K$, the cost of the single reduction is given by $K + \mathcal{O}(n^2)$ and the cost of the all possible 2 by 2 reduction is then given by:
+
 $$
 \binom{n}{2} (K + \mathcal{O}(n^2)) = \frac{n(n-1)}{2} (K + \mathcal{O}(n^2)) = \mathcal{O}(n^4) \hspace{2mm} \text{or} \hspace{2mm} \mathcal{O}(Kn^2)
 $$
+
 Since $K \ge n^2$, this means that the cost of finding all 2 by 2 reduction is at the very list $\mathcal{O}(n^4)$ which is significantly slower than the iterative methods. Moreover, from there we then have to find the Gershgorin regions of each reduction and find the intersection of those regions. The cost of this is not cheap.
 
 ## Conclusion
