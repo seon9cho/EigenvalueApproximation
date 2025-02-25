@@ -1,6 +1,6 @@
 # Approximating Eigenvalues Using Isospectral Matrix Reduction and Gershgorin’s Circle Theorem
 
-Eigenvalue solving problems has been a subject of interest in the field of numerical linear algebra for many years. It has been a large portion of our discussion in Math 510. When first approaching this problem, I recognized that it would be difficult and probably impossible to find methods that are better than the current algorithms. However, I wanted to show from this research that there are possible new and innovative ways to approach the problem. The main topic of discussion in my research is from the findings of Dr. Webb in the department of Mathematics here at BYU, so I want to thank him for his findings and contributions.
+Eigenvalue solving problems has been a subject of interest in the field of numerical linear algebra for many years. When first approaching this problem, I recognized that it would be difficult and probably impossible to find methods that are better than the current algorithms. However, I wanted to show from this research that there are possible new and innovative ways to approach the problem. The main topic of discussion in my research is from the findings of Dr. Webb in the department of Mathematics here at BYU, so I want to thank him for his findings and contributions.
 
 ## Eigenvalue Problem
 
